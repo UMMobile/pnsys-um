@@ -44,20 +44,6 @@ router.get('/:id',
   show)
 
 /**
- * @api {put} /notifications/:id Update notification
- * @apiName UpdateNotification
- * @apiGroup Notification
- * @apiParam message Notification's message.
- * @apiParam options Notification's options.
- * @apiSuccess {Object} notification Notification's data.
- * @apiError {Object} 400 Some parameters may contain invalid values.
- * @apiError 404 Notification not found.
- */
-router.put('/:id',
-  body({ message, options }),
-  update)
-
-/**
  * @api {delete} /notifications/:id Cancel schedule notification
  * @apiName CancelNotification
  * @apiGroup Notification

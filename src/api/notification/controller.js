@@ -1,15 +1,11 @@
-import { success, notFound, invalidApp } from '../../services/response/'
+import { success, notFound, invalidApp, error, providerError } from '../../services/response/'
 import { getPushClient } from "../../services/pushnotifications";
 import { Notification } from '.'
 
 export const create = ({ bodymen: { body: { message, options } } }, res, next) =>
-  invalidApp(res)(getPushClient())
+  invalidApp(res, getPushClient())
     .then(async (client) => await client.sendNotification(message, options))
-    .then(({ status, error, body }) => {
-      if(error || body.errors)
-        res.status(status).json(body)
-      return body
-    })
+    .then(providerError(res))
     .then(async (res_notification) => await Notification.create({
       _id: Notification.extractId(res_notification),
       message,
@@ -18,7 +14,7 @@ export const create = ({ bodymen: { body: { message, options } } }, res, next) =
     }))
     .then((notification) => notification.view(true))
     .then(success(res, 201))
-    .catch(next)
+    .catch(error(res, 400))
 
 export const index = ({ querymen: { query, select, cursor }}, res, next) =>
   Notification.find(query, select, cursor)
@@ -33,17 +29,11 @@ export const show = ({ params }, res, next) =>
     .then(success(res))
     .catch(next)
 
-export const update = ({ bodymen: { body }, params }, res, next) =>
+export const cancel = ({ params }, res, next) =>
   Notification.findById(params.id)
     .then(notFound(res))
-    .then((notification) => notification ? Object.assign(notification, body).save() : null)
-    .then((notification) => notification ? notification.view(true) : null)
-    .then(success(res))
-    .catch(next)
-
-export const cancel = ({ params }, res, next) =>
-  invalidApp(res)(getPushClient())
+    .then(async () => await invalidApp(res, getPushClient()))
     .then(async (client) => await client.cancelNotification(params.id))
     .then((r) => r.body.success ? Notification.findByIdAndUpdate(params.id, { canceled : true }) : null)
     .then(success(res, 204))
-    .catch(next)
+    .catch(error(res, 500))

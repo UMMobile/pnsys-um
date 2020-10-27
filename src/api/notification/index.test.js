@@ -1,149 +1,112 @@
 import request from 'supertest'
 import { apiRoot } from '../../config'
-import { signSync } from '../../services/jwt'
 import express from '../../services/express'
-import { User } from '../user'
 import routes, { Notification } from '.'
 
 const app = () => express(apiRoot, routes)
 
-let userSession, adminSession, notification
+let notification
 
 beforeEach(async () => {
-  const user = await User.create({ email: 'a@a.com', password: '123456' })
-  const admin = await User.create({ email: 'c@c.com', password: '123456', role: 'admin' })
-  userSession = signSync(user.id)
-  adminSession = signSync(admin.id)
-  notification = await Notification.create({})
+  notification = await Notification.create({
+    _id: "1adc99d6-7f73-48bf-b3d8-49491f684986",
+    message: {
+      heading: {
+        en: "Example",
+        es: "Ejemplo"
+      },
+      content: {
+        en: "This is an example",
+        es: "Este es un ejemplo"
+      }
+    },
+    options: {
+      targets: {
+        to: {
+          type: "external",
+          value: [
+            "1130745"
+          ]
+        }
+      }
+    },
+    response: {
+      id: "1adc99d6-7f73-48bf-b3d8-49491f684986",
+      recipients: 1,
+      external_id: null
+    }
+  })
 })
 
-test('POST /notifications 201 (admin)', async () => {
+test('POST /notifications 201', async () => {
   const { status, body } = await request(app())
     .post(`${apiRoot}`)
-    .send({ access_token: adminSession, message: 'test', options: 'test' })
+    .send(notification)
   expect(status).toBe(201)
   expect(typeof body).toEqual('object')
-  expect(body.message).toEqual('test')
-  expect(body.options).toEqual('test')
+  expect(body.message.heading.en).toEqual('Example')
+  expect(body.options.targets.to.type).toEqual('external')
 })
 
-test('POST /notifications 401 (user)', async () => {
+test('POST /notifications 400', async () => {
   const { status } = await request(app())
     .post(`${apiRoot}`)
-    .send({ access_token: userSession })
-  expect(status).toBe(401)
+    .send()
+  expect(status).toBe(400)
 })
 
-test('POST /notifications 401', async () => {
-  const { status } = await request(app())
-    .post(`${apiRoot}`)
-  expect(status).toBe(401)
-})
-
-test('GET /notifications 200 (admin)', async () => {
+test('GET /notifications 200', async () => {
   const { status, body } = await request(app())
     .get(`${apiRoot}`)
-    .query({ access_token: adminSession })
+    .query()
   expect(status).toBe(200)
   expect(Array.isArray(body)).toBe(true)
 })
 
-test('GET /notifications 401 (user)', async () => {
-  const { status } = await request(app())
-    .get(`${apiRoot}`)
-    .query({ access_token: userSession })
-  expect(status).toBe(401)
-})
-
-test('GET /notifications 401', async () => {
-  const { status } = await request(app())
-    .get(`${apiRoot}`)
-  expect(status).toBe(401)
-})
-
-test('GET /notifications/:id 200 (admin)', async () => {
+test('GET /notifications/:id 200', async () => {
   const { status, body } = await request(app())
-    .get(`${apiRoot}/${notification.id}`)
-    .query({ access_token: adminSession })
+    .get(`${apiRoot}/${notification._id}`)
+    .query()
   expect(status).toBe(200)
   expect(typeof body).toEqual('object')
-  expect(body.id).toEqual(notification.id)
+  expect(body._id).toEqual(notification._id)
 })
 
-test('GET /notifications/:id 401 (user)', async () => {
+test('GET /notifications/:id 404', async () => {
   const { status } = await request(app())
-    .get(`${apiRoot}/${notification.id}`)
-    .query({ access_token: userSession })
-  expect(status).toBe(401)
-})
-
-test('GET /notifications/:id 401', async () => {
-  const { status } = await request(app())
-    .get(`${apiRoot}/${notification.id}`)
-  expect(status).toBe(401)
-})
-
-test('GET /notifications/:id 404 (admin)', async () => {
-  const { status } = await request(app())
-    .get(apiRoot + '/123456789098765432123456')
-    .query({ access_token: adminSession })
+    .get(`${apiRoot}/123456789098765432123456`)
+    .query()
   expect(status).toBe(404)
 })
 
-test('PUT /notifications/:id 200 (admin)', async () => {
-  const { status, body } = await request(app())
-    .put(`${apiRoot}/${notification.id}`)
-    .send({ access_token: adminSession, message: 'test', options: 'test' })
-  expect(status).toBe(200)
-  expect(typeof body).toEqual('object')
-  expect(body.id).toEqual(notification.id)
-  expect(body.message).toEqual('test')
-  expect(body.options).toEqual('test')
+test('Schedule & Cancel notification 204', async () => {
+  expect.assertions(2)
+
+  const tomorrow = () => {
+    const date = new Date()
+    date.setDate(date.getDate() + 1)
+    return date.toString();
+  }
+
+  notification.options.extra = {
+    send_after: tomorrow()
+  }
+
+  const { status: status_created, body } = await request(app())
+    .post(`${apiRoot}`)
+    .send(notification)
+  expect(status_created).toBe(201)
+  
+  let scheduled = {...body}
+  const { status: status_canceled } = await request(app())
+    .put(`${apiRoot}/${scheduled._id}/cancel`)
+    .query()
+  expect(status_canceled).toBe(204)
 })
 
-test('PUT /notifications/:id 401 (user)', async () => {
+test('Cancel notification 404', async () => {
   const { status } = await request(app())
-    .put(`${apiRoot}/${notification.id}`)
-    .send({ access_token: userSession })
-  expect(status).toBe(401)
-})
-
-test('PUT /notifications/:id 401', async () => {
-  const { status } = await request(app())
-    .put(`${apiRoot}/${notification.id}`)
-  expect(status).toBe(401)
-})
-
-test('PUT /notifications/:id 404 (admin)', async () => {
-  const { status } = await request(app())
-    .put(apiRoot + '/123456789098765432123456')
-    .send({ access_token: adminSession, message: 'test', options: 'test' })
-  expect(status).toBe(404)
-})
-
-test('DELETE /notifications/:id 204 (admin)', async () => {
-  const { status } = await request(app())
-    .delete(`${apiRoot}/${notification.id}`)
-    .query({ access_token: adminSession })
-  expect(status).toBe(204)
-})
-
-test('DELETE /notifications/:id 401 (user)', async () => {
-  const { status } = await request(app())
-    .delete(`${apiRoot}/${notification.id}`)
-    .query({ access_token: userSession })
-  expect(status).toBe(401)
-})
-
-test('DELETE /notifications/:id 401', async () => {
-  const { status } = await request(app())
-    .delete(`${apiRoot}/${notification.id}`)
-  expect(status).toBe(401)
-})
-
-test('DELETE /notifications/:id 404 (admin)', async () => {
-  const { status } = await request(app())
-    .delete(apiRoot + '/123456789098765432123456')
-    .query({ access_token: adminSession })
+    .put(`${apiRoot}/123456789098765432123456/cancel`)
+    .query()
   expect(status).toBe(404)
 })
