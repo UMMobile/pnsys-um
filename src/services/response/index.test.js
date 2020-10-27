@@ -1,4 +1,6 @@
+import OneSignal from '@jonathangomz/onesignal-client'
 import * as response from '.'
+import { getPushClient } from '../pushnotifications'
 
 let res
 
@@ -43,41 +45,94 @@ describe('notFound', () => {
   })
 })
 
-describe('authorOrAdmin', () => {
-  let user, entity
+describe('invalidApp', () => {
+  it('returns the app when app is valid', async () => {
+    const validApp = getPushClient();
+    expect(await response.invalidApp(res, validApp)).toEqual(validApp)
+    expect(res.status).not.toBeCalled()
+  })
 
-  beforeEach(() => {
-    user = {
-      id: 1,
-      role: 'user'
+  it('responds with status 400 when app is not valid', async () => {
+    const invalidApp = new OneSignal({
+      appId: "0149df36-502c-445a-9626-0bf54d8ea7ba",
+      authKey: "asasdfasdfasfdasfasfasdfasdf",
+      restApiKey: "asdfdasfasdfasdfasdfasdfadsf"
+    });
+    expect(await response.invalidApp(res, invalidApp)).toBeNull()
+    expect(res.status).toBeCalledWith(400)
+    expect(res.json).toBeCalledTimes(1)
+  })
+})
+
+describe('providerError', () => {
+  it('returns the body when response is valid', async () => {
+    const res_provider = {
+      status: 200,
+      body: {
+        id: "b98881cc-1e94-4366-bbd9-db8f3429292b",
+        recipients: 1,
+        external_id: null
+      }
     }
-    entity = {
-      author: {
-        id: 1,
-        equals (id) {
-          return id === this.id
+    expect(await response.providerError(res)(res_provider)).toEqual(res_provider.body)
+    expect(res.status).not.toBeCalled()
+  })
+
+  it('responds with status 500 when get error from provider', async () => {
+    const res_provider = {
+      status: 400,
+      body: {
+        errors: [
+            "Message Notifications must have English language content"
+        ]
+      }
+    }
+    expect(await response.providerError(res)(res_provider)).toBeNull()
+    expect(res.status).toBeCalledWith(500)
+    expect(res.json).toBeCalledTimes(1)
+  })
+
+  it('responds with status 500 when get error from provider', async () => {
+    const res_provider = {
+      status: 200,
+      body: {
+        id: "c0bf597f-08e9-4e0a-8cc5-0de94ffa6033",
+        recipients: 1,
+        external_id: null,
+        errors: {
+            invalid_player_ids: [
+                "b186912c-cf25-4688-8218-06cb13e09a4f"
+            ]
         }
       }
     }
+    expect(await response.providerError(res)(res_provider)).toBeNull()
+    expect(res.status).toBeCalledWith(500)
+    expect(res.json).toBeCalledTimes(1)
+  })
+})
+
+describe('error', () => {
+  it('responds with status 500 and error message', () => {
+    const error = new Error("Bad Request")
+    expect(response.error(res, 500)(error)).toBeNull()
+    expect(res.status).toBeCalledTimes(1)
+    expect(res.status).toBeCalledWith(500)
+    expect(res.json).toBeCalledTimes(1)
   })
 
-  it('returns the passed entity when author is the same', () => {
-    expect(response.authorOrAdmin(res, user, 'author')(entity)).toEqual(entity)
-  })
-
-  it('returns the passed entity when author is admin', () => {
-    user.role = 'admin'
-    expect(response.authorOrAdmin(res, user, 'user')(entity)).toEqual(entity)
-  })
-
-  it('responds with status 401 when author is not the same or admin', () => {
-    user.id = 2
-    expect(response.authorOrAdmin(res, user, 'author')(entity)).toBeNull()
-    expect(res.status).toBeCalledWith(401)
-    expect(res.end).toHaveBeenCalledTimes(1)
-  })
-
-  it('returns null without sending response when entity has not been passed', () => {
-    expect(response.authorOrAdmin(res, user, 'author')()).toBeNull()
+  it('responds with status 400 and error body', () => {
+    const error = new Error("Bad Request")
+    error.response = {
+      body: {
+        errors: [
+            "some error message"
+        ]
+      }
+    }
+    expect(response.error(res, 400)(error)).toBeNull()
+    expect(res.json).toBeCalledTimes(1)
+    expect(res.status).toBeCalledWith(400)
+    expect(res.json).toBeCalledWith({ errors: [ 'some error message' ] })
   })
 })

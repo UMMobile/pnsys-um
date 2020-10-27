@@ -13,24 +13,33 @@ export const notFound = (res) => (entity) => {
   return null
 }
 
-export const authorOrAdmin = (res, user, userField) => (entity) => {
-  if (entity) {
-    const isAdmin = user.role === 'admin'
-    const isAuthor = entity[userField] && entity[userField].equals(user.id)
-    if (isAuthor || isAdmin) {
-      return entity
-    }
-    res.status(401).end()
+export const invalidApp = async (res, app) => {
+  let isvalid
+  try {
+    isvalid = await app.isValid();
+  } catch(err) { }
+
+  if(isvalid) {
+    return app
+  } else {
+    res.status(400).json({
+      errors: [
+        'Invalid app. Verify your keys or appId'
+      ]
+    })
+    return null
   }
-  return null
 }
 
-export const invalidApp = (res) => async (app) => {
-  const isvalid = await app.isValid();
-  if(isvalid) {
-    return app;
+export const providerError = (res) => ({ status, error, body }) => {
+  if(status !== 200 || error || body.errors) {
+    res.status(500).json(body.errors || error)
+    return null
   }
-  res.status(400).json({
-    message: 'Invalid app. Verify your keys or appId'
-  })
+  return body
+}
+
+export const error = (res, status) => (error) => {
+  res.status(status).json(error.response?.body || error)
+  return null
 }
