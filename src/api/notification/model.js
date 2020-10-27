@@ -33,7 +33,10 @@ const notificationSchema = new Schema({
     type: String,
     required: true,
   },
-  message: [messageSchema],
+  message: {
+    type: messageSchema,
+    required: true,
+  },
   options: {
     type: Schema.Types.Mixed,
   },
