@@ -5,7 +5,5 @@ export const getPushClient = () =>  {
   switch (pn.provider) {
     case 'os':
       return initOneSignalClient(pn.keys);
-    default:
-      return initOneSignalClient(pn.keys);
   }
 }
