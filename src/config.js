@@ -27,18 +27,16 @@ const config = {
     ip: process.env.IP || '0.0.0.0',
     apiRoot: process.env.API_ROOT || '',
     defaultEmail: 'no-reply@um-push.com',
-    sendgridKey: requireProcessEnv('SENDGRID_KEY'),
-    masterKey: requireProcessEnv('MASTER_KEY'),
-    jwtSecret: requireProcessEnv('JWT_SECRET'),
     mongo: {
       options: {
         useUnifiedTopology: true,
         useNewUrlParser: true,
-        useCreateIndex: true
+        useCreateIndex: true,
+        useFindAndModify: false,
       }
     },
     pushnotifications: {
-      provider: 'os',
+      provider: process.env.PN_PROVIDER || 'os',
       keys: {
         authKey: requireProcessEnv('AUTH_KEY'),
         restApiKey: requireProcessEnv('REST_API_KEY'),
@@ -59,7 +57,7 @@ const config = {
     ip: process.env.IP || undefined,
     port: process.env.PORT || 8080,
     mongo: {
-      uri: requireProcessEnv('MONGODB_URI') || 'mongodb://localhost/um-push'
+      uri: requireProcessEnv('MONGODB_URI') || 'mongodb://localhost/pnsys-um'
     }
   }
 }
