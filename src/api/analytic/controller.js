@@ -13,7 +13,6 @@ export const create = ({ body: { notificationId, event, userId } }, res, next) =
         return await (await Notification.findOneAndUpdate({ _id: notificationId }, {
           $addToSet: { 'analytics.received': userId }
         }, { new: true })).analytics.received
-      else throw "Invalid event";
     })
     .then(success(res, 200))
     .catch(next)

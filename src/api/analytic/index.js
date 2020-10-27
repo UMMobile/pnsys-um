@@ -19,6 +19,7 @@ router.post('/',
     notificationId,
     event: {
       type: String,
+      enum: ['clicked', 'received'],
       required: true,
     },
     userId: {
