@@ -23,7 +23,7 @@ beforeEach(async () => {
     options: {
       targets: {
         to: {
-          type: "external",
+          type: "externals",
           value: [
             "1130745"
           ]
@@ -45,7 +45,7 @@ test('POST /notifications 201', async () => {
   expect(status).toBe(201)
   expect(typeof body).toEqual('object')
   expect(body.message.heading.en).toEqual('Example')
-  expect(body.options.targets.to.type).toEqual('external')
+  expect(body.options.targets.to.type).toEqual('externals')
 })
 
 test('POST /notifications 400', async () => {
