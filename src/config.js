@@ -11,7 +11,7 @@ const requireProcessEnv = (name) => {
 }
 
 /* istanbul ignore next */
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'github_action') {
   const dotenv = require('dotenv-safe')
   dotenv.config({
     path: path.join(__dirname, '../.env'),
