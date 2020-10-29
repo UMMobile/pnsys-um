@@ -45,7 +45,7 @@
     "@babel/preset-env": "^7.8.4",
     "@babel/register": "^7.8.3",
     "@babel/runtime": "^7.8.4",
-    "@jonathangomz/onesignal-client": "^1.0.0-beta.0",
+    "@jonathangomz/onesignal-client": "^1.0.0-beta.2",
     "@sendgrid/mail": "^6.5.4",
     "bcrypt": "^4.0.1",
     "bluebird": "^3.7.2",
