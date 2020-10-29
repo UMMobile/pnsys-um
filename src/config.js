@@ -4,7 +4,6 @@ import merge from 'lodash/merge'
 
 /* istanbul ignore next */
 const requireProcessEnv = (name) => {
-  if(process.env.NODE_ENV === 'github_action') return
   if (!process.env[name]) {
     throw new Error('You must set the ' + name + ' environment variable')
   }
@@ -12,7 +11,7 @@ const requireProcessEnv = (name) => {
 }
 
 /* istanbul ignore next */
-if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'github_action') {
+if (process.env.NODE_ENV !== 'production') {
   const dotenv = require('dotenv-safe')
   dotenv.config({
     path: path.join(__dirname, '../.env'),

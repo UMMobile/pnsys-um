@@ -21,4 +21,7 @@ jobs:
     - run: npm install
     - run: npm test
       env:
-        NODE_ENV: github_action
+        MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        REST_API_KEY: ${{ secrets.REST_API_KEY }}
+        AUTH_KEY: ${{ secrets.AUTH_KEY }}
+        APP_ID: ${{ secrets.APP_ID }}
