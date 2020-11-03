@@ -1,5 +1,5 @@
 {
   "name": "pnsys-um",
-  "script": "src",
-  "cwd": "/home/adminserver/pnsys-um/current"
+  "script": "current/src",
+  "cwd": "/home/adminserver/pnsys-um"
 }
