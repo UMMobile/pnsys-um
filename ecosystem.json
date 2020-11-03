@@ -1,0 +1,5 @@
+{
+  "name": "pnsys-um",
+  "script": "/current/src/index.js",
+  "cwd": "/home/adminserver/pnsys-um"
+}
