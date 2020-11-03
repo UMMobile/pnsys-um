@@ -1,5 +1,3 @@
 {
-  "name": "pnsys-um",
-  "script": "src",
-  "cwd": "/home/adminserver/pnsys-um/current"
+  "name": "pnsys-um"
 }
