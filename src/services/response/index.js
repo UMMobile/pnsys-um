@@ -38,8 +38,3 @@ export const providerError = (res) => ({ status, error, body }) => {
   }
   return body
 }
-
-export const error = (res, status) => (error) => {
-  res.status(status).json(error.response?.body || error)
-  return null
-}

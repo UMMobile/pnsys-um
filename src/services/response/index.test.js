@@ -111,28 +111,3 @@ describe('providerError', () => {
     expect(res.json).toBeCalledTimes(1)
   })
 })
-
-describe('error', () => {
-  it('responds with status 500 and error message', () => {
-    const error = new Error("Bad Request")
-    expect(response.error(res, 500)(error)).toBeNull()
-    expect(res.status).toBeCalledTimes(1)
-    expect(res.status).toBeCalledWith(500)
-    expect(res.json).toBeCalledTimes(1)
-  })
-
-  it('responds with status 400 and error body', () => {
-    const error = new Error("Bad Request")
-    error.response = {
-      body: {
-        errors: [
-            "some error message"
-        ]
-      }
-    }
-    expect(response.error(res, 400)(error)).toBeNull()
-    expect(res.json).toBeCalledTimes(1)
-    expect(res.status).toBeCalledWith(400)
-    expect(res.json).toBeCalledWith({ errors: [ 'some error message' ] })
-  })
-})

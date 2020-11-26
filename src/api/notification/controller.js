@@ -4,17 +4,17 @@ import { Notification } from '.'
 
 export const create = ({ bodymen: { body: { message, options } } }, res, next) =>
   invalidApp(res, getPushClient())
-    .then(async (client) => await client.sendNotification(message, options))
+    .then((client) => client.sendNotification(message, options))
     .then(providerError(res))
-    .then(async (res_notification) => await Notification.create({
+    .then((res_notification) => res_notification ? Notification.create({
       _id: Notification.extractId(res_notification),
       message,
       options,
       response: res_notification
-    }))
-    .then((notification) => notification.view(true))
+    }) : null)
+    .then((notification) => notification ? notification.view(true) : null)
     .then(success(res, 201))
-    .catch(error(res, 400))
+    .catch(next)
 
 export const index = ({ querymen: { query, select, cursor }}, res, next) =>
   Notification.find(query, select, cursor)
@@ -32,8 +32,8 @@ export const show = ({ params }, res, next) =>
 export const cancel = ({ params }, res, next) =>
   Notification.findById(params.id)
     .then(notFound(res))
-    .then(async () => await invalidApp(res, getPushClient()))
-    .then(async (client) => await client.cancelNotification(params.id))
-    .then((r) => r.body.success ? Notification.findByIdAndUpdate(params.id, { canceled : true }) : null)
+    .then((found) => found ? invalidApp(res, getPushClient()) : null)
+    .then((client) => client ? client.cancelNotification(params.id) : null)
+    .then((r) => r ? r.body.success ? Notification.findByIdAndUpdate(params.id, { canceled : true }) : null : null)
     .then(success(res, 204))
-    .catch(error(res, 500))
+    .catch(next)
