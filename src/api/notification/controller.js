@@ -9,7 +9,6 @@ export const create = ({ bodymen: { body: { message, options } } }, res, next) =
         const response = await client.sendNotification(message, options)
         return response
       } catch (error) {
-        console.log('error', error);
         if(error.name === 'ValidationError')
           return {
             body: {
