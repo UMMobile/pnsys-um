@@ -6,8 +6,10 @@ import bodyParser from 'body-parser'
 import { errorHandler as queryErrorHandler } from 'querymen'
 import { errorHandler as bodyErrorHandler } from 'bodymen'
 import { env } from '../../config'
+import initSentry from "../sentry";
 
 export default (apiRoot, routes) => {
+  const sentry = initSentry()
   const app = express()
 
   /* istanbul ignore next */
@@ -17,11 +19,13 @@ export default (apiRoot, routes) => {
     app.use(morgan('dev'))
   }
 
+  app.use(sentry.Handlers.requestHandler())
   app.use(bodyParser.urlencoded({ extended: false }))
   app.use(bodyParser.json())
   app.use(apiRoot, routes)
   app.use(queryErrorHandler())
   app.use(bodyErrorHandler())
+  app.use(sentry.Handlers.errorHandler())
 
   return app
 }

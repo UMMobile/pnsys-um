@@ -42,6 +42,11 @@ const config = {
         appId: requireProcessEnv('APP_ID'),
       }
     },
+    sentry: {
+      dsn: process.env.SENTRY_DSN,
+      tracesSampleRate: 1,
+      environment: process.env.NODE_ENV || 'development',
+    },
   },
   test: { },
   development: {
@@ -57,6 +62,9 @@ const config = {
     port: process.env.PORT || 8080,
     mongo: {
       uri: process.env.MONGODB_URI || 'mongodb://localhost/pnsys-um'
+    },
+    sentry: {
+      tracesSampleRate: 0.7
     }
   }
 }
