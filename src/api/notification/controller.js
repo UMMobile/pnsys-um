@@ -4,7 +4,29 @@ import { Notification } from '.'
 
 export const create = ({ bodymen: { body: { message, options } } }, res, next) =>
   invalidApp(res, getPushClient())
-    .then((client) => client.sendNotification(message, options))
+    .then(async (client) => {
+      try {
+        const response = await client.sendNotification(message, options)
+        return response
+      } catch (error) {
+        console.log('error', error);
+        if(error.name === 'ValidationError')
+          return {
+            body: {
+              errors:[
+                ...error.details?.map((detail) => {
+                  if(typeof detail.message === 'string')
+                    return detail.message?.replace(/\"/g, "'")
+                  else
+                    return detail.message
+                })
+              ]
+            }
+          }
+        else if(error.response)
+          return error.response
+      }
+    })
     .then(providerError(res))
     .then((res_notification) => res_notification ? Notification.create({
       _id: Notification.extractId(res_notification),
