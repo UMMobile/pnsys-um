@@ -33,6 +33,9 @@ export const invalidApp = async (res, app) => {
 
 export const providerError = (res) => ({ status, error, body }) => {
   if(status !== 200 || error || body.errors) {
+    if(body.errors?.invalid_external_user_ids && body.recipients !== 0)
+      return body
+      
     res.status(500).json(body.errors || error)
     return null
   }
