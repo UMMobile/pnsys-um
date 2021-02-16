@@ -1,3 +1,4 @@
 {
-  "name": "pnsys-um"
+  "name": "pnsys-um",
+  "script": "src/index.js"
 }
