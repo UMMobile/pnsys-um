@@ -9,12 +9,12 @@ export const create = ({ bodymen: { body: { message, options } } }, res, next) =
         const response = await client.sendNotification(message, options)
         return response
       } catch (error) {
-        if(error.name === 'ValidationError')
+        if (error.name === 'ValidationError')
           return {
             body: {
-              errors:[
+              errors: [
                 ...error.details?.map((detail) => {
-                  if(typeof detail.message === 'string')
+                  if (typeof detail.message === 'string')
                     return detail.message?.replace(/\"/g, "'")
                   else
                     return detail.message
@@ -22,7 +22,7 @@ export const create = ({ bodymen: { body: { message, options } } }, res, next) =
               ]
             }
           }
-        else if(error.response)
+        else if (error.response)
           return error.response
       }
     })
@@ -41,11 +41,11 @@ export const create = ({ bodymen: { body: { message, options } } }, res, next) =
     .then(success(res, 201))
     .catch(next)
 
-export const index = ({ querymen: { query, select, cursor }}, res, next) =>
+export const index = ({ querymen: { query, select, cursor } }, res, next) =>
   Notification.find(query, select, cursor)
-  .then((notifications) => notifications.map((notification) => notification.view()))
-  .then(success(res))
-  .catch(next)
+    .then((notifications) => notifications.map((notification) => notification.view()))
+    .then(success(res))
+    .catch(next)
 
 export const show = ({ params }, res, next) =>
   Notification.findById(params.id)
@@ -59,6 +59,6 @@ export const cancel = ({ params }, res, next) =>
     .then(notFound(res))
     .then((found) => found ? invalidApp(res, getPushClient()) : null)
     .then((client) => client ? client.cancelNotification(params.id) : null)
-    .then((r) => r ? r.body.success ? Notification.findByIdAndUpdate(params.id, { canceled : true }) : null : null)
+    .then((r) => r ? r.body.success ? Notification.findByIdAndUpdate(params.id, { canceled: true }) : null : null)
     .then(success(res, 204))
     .catch(next)

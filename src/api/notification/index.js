@@ -4,7 +4,7 @@ import { middleware as body } from 'bodymen'
 import { create, index, show, update, cancel } from './controller'
 import Notification, { schema } from './model'
 
-const router = new Router({mergeParams: true})
+const router = new Router({ mergeParams: true })
 const { appId, message, options } = schema.tree
 
 router.post('/',
