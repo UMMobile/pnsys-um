@@ -5,14 +5,14 @@ import { create, index, show, update, cancel } from './controller'
 import Notification, { schema } from './model'
 
 const router = new Router({ mergeParams: true })
-const { appId, message, options } = schema.tree
+const { appId, message, options, sender } = schema.tree
 
 router.post('/',
-  body({ message, options: {} }),
+  body({ message, options: {}, sender }),
   create)
 
 router.get('/',
-  query(),
+  query({ sender: { type: String, paths: ['sender'] } }),
   index)
 
 router.get('/:id',

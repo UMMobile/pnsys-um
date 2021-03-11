@@ -45,7 +45,11 @@ const notificationSchema = new Schema({
     required: true,
   },
   analytics: analyticsSchema,
-  canceled: Boolean
+  canceled: Boolean,
+  sender: {
+    type: String,
+    default: ''
+  },
 }, {
   timestamps: true,
   toJSON: {
@@ -70,6 +74,7 @@ notificationSchema.methods = {
       ...view,
       response: this.response,
       analytics: this.analytics,
+      sender: this.sender,
     } : view
   }
 }

@@ -2,7 +2,7 @@ import { success, notFound, invalidApp, error, providerError } from '../../servi
 import { getPushClient } from "../../services/pushnotifications";
 import { Notification } from '.'
 
-export const create = ({ bodymen: { body: { message, options } } }, res, next) =>
+export const create = ({ bodymen: { body: { message, options, sender } } }, res, next) =>
   invalidApp(res, getPushClient())
     .then(async (client) => {
       try {
@@ -31,6 +31,7 @@ export const create = ({ bodymen: { body: { message, options } } }, res, next) =
       _id: Notification.extractId(res_notification),
       message,
       options,
+      sender,
       response: res_notification,
       analytics: {
         clicked: [],
