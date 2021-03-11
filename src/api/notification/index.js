@@ -5,7 +5,7 @@ import { create, index, show, update, cancel } from './controller'
 import Notification, { schema } from './model'
 
 const router = new Router({ mergeParams: true })
-const { appId, message, options, sender } = schema.tree
+const { message, sender } = schema.tree
 
 router.post('/',
   body({ message, options: {}, sender }),
