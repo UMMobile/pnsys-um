@@ -31,7 +31,11 @@ export const create = ({ bodymen: { body: { message, options } } }, res, next) =
       _id: Notification.extractId(res_notification),
       message,
       options,
-      response: res_notification
+      response: res_notification,
+      analytics: {
+        clicked: [],
+        received: [],
+      }
     }) : null)
     .then((notification) => notification ? notification.view(true) : null)
     .then(success(res, 201))
