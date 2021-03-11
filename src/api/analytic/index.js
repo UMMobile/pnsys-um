@@ -23,7 +23,12 @@ router.post('/',
   create)
 
 router.get('/',
-  query(),
+  query({
+    sender: {
+      type: String,
+      paths: ['sender']
+    }
+  }),
   index)
 
 router.get('/:id',
