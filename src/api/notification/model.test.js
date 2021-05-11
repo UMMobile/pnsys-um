@@ -22,7 +22,7 @@ describe('view', () => {
           to: {
             type: "external",
             value: [
-              "1130745"
+              "1170938"
             ]
           }
         }

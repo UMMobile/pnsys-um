@@ -24,7 +24,7 @@ beforeEach(async () => {
         to: {
           type: "external",
           value: [
-            "1130745"
+            "1170938"
           ]
         }
       }
@@ -35,7 +35,7 @@ beforeEach(async () => {
       external_id: null
     },
     analytics: {
-      clicked: [ "1130795" ]
+      clicked: [ "1170938" ]
     }
   })
 })
@@ -46,22 +46,22 @@ test('POST:received /analytics 200', async () => {
     .send({
       notificationId: "1adc99d6-7f73-48bf-b3d8-49491f684986",
       event: "received",
-      userId: "1130745"
+      userId: "1170938"
     })
   expect(status).toBe(200)
   expect(Array.isArray(body)).toBe(true)
-  expect(body).toContain("1130745")
+  expect(body).toContain("1170938")
 
   const { status: status_clicked, body: body_clicked } = await request(app())
     .post(`${apiRoot}`)
     .send({
       notificationId: "1adc99d6-7f73-48bf-b3d8-49491f684986",
       event: "clicked",
-      userId: "1130745"
+      userId: "1170938"
     })
   expect(status_clicked).toBe(200)
   expect(Array.isArray(body_clicked)).toBe(true)
-  expect(body_clicked).toContain("1130745")
+  expect(body_clicked).toContain("1170938")
 })
 
 test('POST:clicked /analytics 200', async () => {
@@ -70,11 +70,11 @@ test('POST:clicked /analytics 200', async () => {
     .send({
       notificationId: "1adc99d6-7f73-48bf-b3d8-49491f684986",
       event: "clicked",
-      userId: "1130745"
+      userId: "1170938"
     })
   expect(status).toBe(200)
   expect(Array.isArray(body)).toBe(true)
-  expect(body).toContain("1130745")
+  expect(body).toContain("1170938")
 })
 
 test('POST /analytics 400', async () => {
@@ -90,7 +90,7 @@ test('POST /analytics 400', async () => {
     .send({
       notificationId: "1adc99d6-7f73-48bf-b3d8-49491f684986",
       event: "somethingwrong",
-      userId: "1130745"
+      userId: "1170938"
     })
   expect(status).toBe(400)
 })
@@ -101,7 +101,7 @@ test('POST /analytics 404', async () => {
     .send({
       notificationId: "wrong-notification-id",
       event: "clicked",
-      userId: "1130745"
+      userId: "1170938"
     })
   expect(status).toBe(404)
 })
@@ -112,7 +112,7 @@ test('GET /analytics 200', async () => {
     .query()
   expect(status).toBe(200)
   expect(Array.isArray(body)).toBe(true)
-  expect(body[0].analytics.clicked).toContain("1130795")
+  expect(body[0].analytics.clicked).toContain("1170938")
 })
 
 test('GET /analytics/:id 200', async () => {
@@ -120,7 +120,7 @@ test('GET /analytics/:id 200', async () => {
     .get(`${apiRoot}/1adc99d6-7f73-48bf-b3d8-49491f684986`)
     .query()
   expect(status).toBe(200)
-  expect(body.analytics.clicked).toContain("1130795")
+  expect(body.analytics.clicked).toContain("1170938")
 })
 
 test('GET /analytics/:id 404', async () => {
