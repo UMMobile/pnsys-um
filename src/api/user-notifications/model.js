@@ -62,6 +62,9 @@ userNotificationSchema.methods = {
     }
 
     return full_notifications
+  },
+  getNotificationById: function(id) {
+    return this.getNotificationsList().filter(notification => notification.content._id === id)[0]
   }
 }
 
