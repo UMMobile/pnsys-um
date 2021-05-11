@@ -1,6 +1,7 @@
 import { success, notFound, invalidApp, error, providerError } from '../../services/response/'
 import { getPushClient } from "../../services/pushnotifications";
 import { Notification } from '.'
+import { UserNotification } from '../user-notifications'
 
 export const create = ({ bodymen: { body: { message, options, sender } } }, res, next) =>
   invalidApp(res, getPushClient())
@@ -38,6 +39,16 @@ export const create = ({ bodymen: { body: { message, options, sender } } }, res,
         received: [],
       }
     }) : null)
+    .then(async (notification) => { // Add single notification for every user
+      if(notification.options?.targets?.to?.type === 'externals') {
+        for(const userId of notification.options?.targets?.to?.value) {
+          await UserNotification.findOneAndUpdate({ _id: userId }, {
+            $addToSet: { 'notifications': { _id: notification._id } }
+          }, { upsert: true })
+        }
+      }
+      return notification
+    })
     .then((notification) => notification ? notification.view(true) : null)
     .then(success(res, 201))
     .catch(next)
