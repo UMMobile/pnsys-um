@@ -43,25 +43,30 @@ userNotificationSchema.methods = {
 
     const full_notifications = []
     for(const notification of view.notifications) {
-      full_notifications.push(notification._id)
+      if(typeof notification._id === 'object')
+        full_notifications.push(notification._id)
+      else
+        full_notifications.push(notification)
     }
     return {
       ...view,
       notifications: [...full_notifications]
     }
   },
-  getNotificationsList: function({ ignoreDeleted = true }) {
+  getNotificationsList: function(options = { ignoreDeleted: true }) {
     const full_notifications = []
     for(const notification of this.notifications) {
       if(notification._id) {
         const userNotification = {}
         if(notification.seen) userNotification.seen = notification.seen
-        if(ignoreDeleted && !notification.deleted) {
-          full_notifications.push({content: notification._id, ...userNotification})
-        } else if (!ignoreDeleted) {
+        if(options.ignoreDeleted && !notification.deleted) {
+          full_notifications.push({content: typeof notification._id === 'object' ? notification._id : notification, ...userNotification})
+        } else if (!options.ignoreDeleted) {
           if(notification.deleted) userNotification.deleted = notification.deleted
-          full_notifications.push({content: notification._id, ...userNotification});
+          full_notifications.push({content: typeof notification._id === 'object' ? notification._id : notification, ...userNotification});
         }
+      } else if(typeof notification._id === 'string') {
+
       }
     }
 
