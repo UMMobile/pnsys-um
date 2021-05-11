@@ -1,5 +1,6 @@
 import { success, notFound, invalidApp, error, providerError } from '../../services/response/'
 import { UserNotification } from '.'
+import { getPushClient } from '../../services/pushnotifications'
 
 export const show = ({ params }, res, next) =>
   UserNotification.findById({_id: params.id})
@@ -16,6 +17,14 @@ export const showSingle = ({ params }, res, next) =>
     .then((notifications) => notifications ? notifications.getNotificationById(params.notificationId) : null)
     .then(success(res))
     .then(notFound(res))
+    .catch(next)
+
+export const showDevices = ({ params }, res, next) =>
+  invalidApp(res, getPushClient())
+    .then(async (client) => await client.viewDevices())
+    .then(providerError(res))
+    .then((res) => res.players.filter(player => player.external_user_id === params.id))
+    .then(success(res, 200))
     .catch(next)
 
 export const update = ({ params, bodymen: { body: { deleted, seen } } }, res, next) =>
