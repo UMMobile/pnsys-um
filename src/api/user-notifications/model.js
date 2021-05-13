@@ -65,8 +65,6 @@ userNotificationSchema.methods = {
           if(notification.deleted) userNotification.deleted = notification.deleted
           full_notifications.push({content: typeof notification._id === 'object' ? notification._id : notification, ...userNotification});
         }
-      } else if(typeof notification._id === 'string') {
-
       }
     }
 
