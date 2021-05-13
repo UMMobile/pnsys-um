@@ -7,7 +7,7 @@ import device from './device'
 const router = new Router()
 
 router.use('/notifications', notification)
-router.use('/user', user_notifications)
+router.use('/users', user_notifications)
 router.use('/analytics', analytic)
 router.use('/devices', device)
 

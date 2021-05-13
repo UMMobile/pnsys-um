@@ -6,20 +6,20 @@ import UserNotification, { schema } from './model'
 const router = new Router({ mergeParams: true })
 const { deleted, seen } = schema.tree
 
-router.get('/:id/notification',
+router.get('/:id/notifications',
   show)
 
 router.get('/:id/devices',
   showDevices)
 
-router.get('/:id/notification/:notificationId',
+router.get('/:id/notifications/:notificationId',
   showSingle)
 
-router.put('/:id/notification/:notificationId',
+router.put('/:id/notifications/:notificationId',
   body({ deleted, seen }),
   update)
 
-router.delete('/:id/notification/:notificationId',
+router.delete('/:id/notifications/:notificationId',
   body({ deleted }),
   update)
 
