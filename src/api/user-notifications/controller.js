@@ -24,7 +24,9 @@ export const showDevices = ({ params }, res, next) =>
     .then(async (client) => await client.viewDevices())
     .then(providerError(res))
     .then((res) => res.players.filter(player => player.external_user_id === params.id))
+    .then((devices) => devices.length > 0 ? devices : null)
     .then(success(res, 200))
+    .then(notFound(res))
     .catch(next)
 
 export const update = ({ params, bodymen: { body: { deleted, seen } } }, res, next) =>
