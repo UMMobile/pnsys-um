@@ -1,6 +1,6 @@
 {
   "name": "pnsys-um",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "main": "src",
   "private": true,
   "description": "API for send push notifications",
