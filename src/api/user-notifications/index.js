@@ -1,10 +1,13 @@
 import { Router } from 'express'
 import { middleware as body } from 'bodymen'
-import { show, showDevices, showSingle, update } from './controller'
+import { show, showDevices, showSingle, validExternals, update } from './controller'
 import UserNotification, { schema } from './model'
 
 const router = new Router({ mergeParams: true })
 const { deleted, seen } = schema.tree
+
+router.get('',
+  validExternals)
 
 router.get('/:id/notifications',
   show)

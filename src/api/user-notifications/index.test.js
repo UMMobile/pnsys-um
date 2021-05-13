@@ -56,6 +56,15 @@ beforeEach(async () => {
   })
 })
 
+test('GET /user 200', async () => {
+  const { status, body } = await request(app())
+    .get(`${apiRoot}`)
+    .query()
+
+  expect(status).toBe(200)
+  expect(Array.isArray(body)).toBeTruthy()
+})
+
 test('GET /user/:id/notifications 200', async () => {
   const { status, body } = await request(app())
     .get(`${apiRoot}/${userId}/notifications`)
