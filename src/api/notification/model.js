@@ -12,6 +12,8 @@ const langSchema = new Schema({
 }, { _id: false })
 
 const messageSchema = new Schema({
+  push_heading: langSchema,
+  push_content: langSchema,
   heading: langSchema,
   content: langSchema,
   subtitle: langSchema,

@@ -7,10 +7,14 @@ export const create = ({ bodymen: { body: { message, options, sender } } }, res,
   invalidApp(res, getPushClient())
     .then(async (client) => {
       try {
-        const response = await client.sendNotification(message, options)
+        const push_message = {
+          heading: message.push_heading ?? message.heading,
+          content: message.push_content ?? message.content,
+        };
+        const response = await client.sendNotification(push_message, options)
         return response
       } catch (error) {
-        if (error.name === 'ValidationError')
+        if (error.name === 'ValidationError') {
           return {
             body: {
               errors: [
@@ -23,14 +27,20 @@ export const create = ({ bodymen: { body: { message, options, sender } } }, res,
               ]
             }
           }
-        else if (error.response)
+        } else if (error.response) {
           return error.response
+        }
       }
     })
     .then(providerError(res))
     .then((res_notification) => res_notification ? Notification.create({
       _id: Notification.extractId(res_notification),
-      message,
+      message: {
+        push_heading: message.push_heading ?? message.heading,
+        push_content: message.push_content ?? message.content,
+        heading: message.heading ?? message.push_heading,
+        content: message.content ?? message.push_content,
+      },
       options,
       sender,
       response: res_notification,
@@ -40,7 +50,7 @@ export const create = ({ bodymen: { body: { message, options, sender } } }, res,
       }
     }) : null)
     .then(async (notification) => { // Add single notification for every user
-      if(notification.options?.targets?.to?.type === 'externals') {
+      if(notification && notification.options?.targets?.to?.type === 'externals') {
         for(const userId of notification.options?.targets?.to?.value) {
           await UserNotification.findOneAndUpdate({ _id: userId }, {
             $addToSet: { 'notifications': { _id: notification._id } }
