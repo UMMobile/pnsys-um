@@ -2,19 +2,19 @@ import { success, notFound, invalidApp, error, providerError } from '../../servi
 import { UserNotification } from '.'
 import { getPushClient } from '../../services/pushnotifications'
 
-export const show = ({ params }, res, next) =>
+export const show = ({ params, querymen: { query }, }, res, next) =>
   UserNotification.findById({_id: params.id})
     .populate('notifications._id', ['message', 'sender', 'createdAt', 'updatedAt'])
     .then(notFound(res))
-    .then((notifications) => notifications ? notifications.getNotificationsList() : null)
+    .then((notifications) => notifications ? notifications.getNotificationsList({ ignoreDeleted: query.ignoreDeleted ?? true }) : null)
     .then(success(res))
     .catch(next)
 
-export const showSingle = ({ params }, res, next) =>
+export const showSingle = ({ params, querymen: { query }, }, res, next) =>
   UserNotification.findById(params.id)
     .populate('notifications._id', ['message', 'sender', 'createdAt', 'updatedAt'])
     .then(notFound(res))
-    .then((notifications) => notifications ? notifications.getNotificationById(params.notificationId) : null)
+    .then((notifications) => notifications ? notifications.getNotificationById(params.notificationId, { ignoreDeleted: query.ignoreDeleted ?? true }) : null)
     .then(success(res))
     .then(notFound(res))
     .catch(next)
