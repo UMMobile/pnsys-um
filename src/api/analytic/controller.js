@@ -1,5 +1,4 @@
-import { notFound, success, invalidApp } from "../../services/response";
-import { getPushClient } from '../../services/pushnotifications'
+import { notFound, success } from "../../services/response";
 import { Notification } from "../notification";
 
 export const create = ({ body: { notificationId, event, userId } }, res, next) =>
@@ -34,10 +33,6 @@ export const showDetails = ({ params: { id } }, res, next) =>
   Notification.findById(id, { analytics: 1, options: 1 })
     .then(notFound(res))
     .then(async (entity) => {
-      const client = await invalidApp(res, getPushClient())
-      const devices = await client.viewDevices();
-      const subscribedUsers = [...new Set(devices.body.players.map(player => player.external_user_id))].filter(externalId => externalId)
-
       const totalUsers = entity.options.targets.to.value.filter(el => subscribedUsers.includes(el));
       const clickedUsers = entity.analytics.clicked;
       const receivedUsers = entity.analytics.received;
