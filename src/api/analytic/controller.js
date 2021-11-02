@@ -1,4 +1,5 @@
-import { notFound, success } from "../../services/response";
+import { notFound, success, invalidApp } from "../../services/response";
+import { getPushClient } from '../../services/pushnotifications'
 import { Notification } from "../notification";
 
 export const create = ({ body: { notificationId, event, userId } }, res, next) =>
@@ -32,26 +33,30 @@ export const show = ({ params: { id } }, res, next) =>
 export const showDetails = ({ params: { id } }, res, next) =>
   Notification.findById(id, { analytics: 1, options: 1 })
     .then(notFound(res))
-    .then((entity) => {
-      const total_users = entity.options.targets.to.value;
-      const clicked_users = entity.analytics.clicked;
-      const received_users = entity.analytics.received;
+    .then(async (entity) => {
+      const client = await invalidApp(res, getPushClient())
+      const devices = await client.viewDevices();
+      const subscribedUsers = [...new Set(devices.body.players.map(player => player.external_user_id))].filter(externalId => externalId)
+
+      const totalUsers = entity.options.targets.to.value.filter(el => subscribedUsers.includes(el));
+      const clickedUsers = entity.analytics.clicked;
+      const receivedUsers = entity.analytics.received;
       const compose = {
         analitycs: {
-          total_users: total_users.length,
+          total_users: totalUsers.length,
           clicked: {
-            quantity: clicked_users.length,
-            quantity_not: total_users.length - clicked_users.length,
-            users: clicked_users,
-            users_not: total_users.filter(el => !clicked_users.includes(el)),
+            quantity: clickedUsers.length,
+            quantity_not: totalUsers.length - clickedUsers.length,
+            users: clickedUsers,
+            users_not: totalUsers.filter(el => !clickedUsers.includes(el)),
           },
           received: {
-            quantity: received_users.length,
-            quantity_not: total_users.length - received_users.length,
-            users: received_users,
-            users_not: total_users.filter(el => !received_users.includes(el)),
+            quantity: receivedUsers.length,
+            quantity_not: totalUsers.length - receivedUsers.length,
+            users: receivedUsers,
+            users_not: totalUsers.filter(el => !receivedUsers.includes(el)),
           },
-          users: total_users,
+          users: totalUsers,
         }
       };
       return res.status(200).json(compose)
