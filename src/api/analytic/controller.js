@@ -18,9 +18,40 @@ export const create = ({ body: { notificationId, event, userId } }, res, next) =
     .catch(next)
 
 export const index = ({ querymen: { query, cursor }}, res, next) =>
-  Notification.find({...query, analytics: { $exists: true }}, { analytics: 1 }, cursor)
+  Notification.find({...query, analytics: { $exists: true }}, { analytics: 1, options: 1, sender: 1 }, cursor)
     .then(notFound(res))
-    .then((entity) => res.json(entity))
+    .then((entities) => {
+      
+      let compose = entities.map(entity => {
+        const totalUsers = entity.options.targets.to.value;
+        const clickedUsers = entity.analytics.clicked;
+        const receivedUsers = entity.analytics.received;
+        return {
+          notification_id: entity.id,
+          notification_content_url: `/notifications/${entity.id}`,
+          analytics: {
+            sender: entity.sender,
+            total_users: totalUsers.length,
+            clicked: {
+              quantity: clickedUsers.length,
+              quantity_not: totalUsers.length - clickedUsers.length,
+              users: clickedUsers,
+              users_not: totalUsers.filter(el => !clickedUsers.includes(el)),
+            },
+            received: {
+              quantity: receivedUsers.length,
+              quantity_not: totalUsers.length - receivedUsers.length,
+              users: receivedUsers,
+              users_not: totalUsers.filter(el => !receivedUsers.includes(el)),
+            },
+            users: totalUsers,
+          }
+        }
+      });
+
+      compose = compose.filter(entity => entity)
+      return res.status(200).json(compose)
+    })
     .catch(next)
 
 export const show = ({ params: { id } }, res, next) =>
