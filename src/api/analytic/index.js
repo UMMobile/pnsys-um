@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { middleware as query } from 'querymen'
 import { middleware as body } from "bodymen"
-import { create, index, show } from './controller'
+import { create, index, show, showDetails } from './controller'
 import { schema } from "../notification";
 
 const router = new Router()
@@ -31,7 +31,8 @@ router.get('/',
   }),
   index)
 
-router.get('/:id',
-  show)
+router.get('/:id', show)
+
+router.get('/:id/details', showDetails)
 
 export default router
