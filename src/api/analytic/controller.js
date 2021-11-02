@@ -33,7 +33,7 @@ export const showDetails = ({ params: { id } }, res, next) =>
   Notification.findById(id, { analytics: 1, options: 1 })
     .then(notFound(res))
     .then(async (entity) => {
-      const totalUsers = entity.options.targets.to.value.filter(el => subscribedUsers.includes(el));
+      const totalUsers = entity.options.targets.to.value;
       const clickedUsers = entity.analytics.clicked;
       const receivedUsers = entity.analytics.received;
       const compose = {
