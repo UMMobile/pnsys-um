@@ -37,7 +37,7 @@ export const validExternals = (_, res, next) =>
     .then(success(res, 200))
     .catch(next)
 
-export const update = ({ params, bodymen: { body: { deleted, seen } } }, res, next) =>
+export const update = ({ params, bodymen: { body: { deleted, seen, received } } }, res, next) =>
   UserNotification.findOneAndUpdate({
     _id: params.id,
     'notifications._id': params.notificationId,
@@ -45,6 +45,7 @@ export const update = ({ params, bodymen: { body: { deleted, seen } } }, res, ne
     '$set': {
       'notifications.$.deleted': deleted,
       'notifications.$.seen': seen,
+      'notifications.$.received': received,
     }
   }, { new: true, omitUndefined: true })
     .populate('notifications._id', ['message', 'sender', 'createdAt', 'updatedAt'])

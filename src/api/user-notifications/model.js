@@ -14,6 +14,10 @@ const notificationSchema = new Schema({
     type: Date,
     required: false,
   },
+  received: {
+    type: Date,
+    required: false,
+  },
 }, {
   _id: false,
   timestamps: true,
@@ -59,6 +63,7 @@ userNotificationSchema.methods = {
       if(notification._id) {
         const userNotification = {}
         if(notification.seen) userNotification.seen = notification.seen
+        if(notification.received) userNotification.received = notification.received
         if(options.ignoreDeleted && !notification.deleted) {
           full_notifications.push({content: typeof notification._id === 'object' ? notification._id : notification, ...userNotification})
         } else if (!options.ignoreDeleted) {

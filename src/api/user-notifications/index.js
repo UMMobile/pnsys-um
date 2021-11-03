@@ -5,7 +5,7 @@ import { show, showDevices, showSingle, validExternals, update } from './control
 import UserNotification, { schema } from './model'
 
 const router = new Router({ mergeParams: true })
-const { deleted, seen } = schema.tree
+const { deleted, seen, received } = schema.tree
 
 router.get('',
   validExternals)
@@ -22,7 +22,7 @@ router.get('/:id/notifications/:notificationId',
   showSingle)
 
 router.put('/:id/notifications/:notificationId',
-  body({ deleted, seen }),
+  body({ deleted, seen, received }),
   update)
 
 router.delete('/:id/notifications/:notificationId',
